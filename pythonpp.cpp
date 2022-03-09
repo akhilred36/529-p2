@@ -38,6 +38,61 @@ vector<vector<string>> read_csv(string filename){ //From https://www.gormanalysi
     return result;
 }
 
+//Read a csv file and interpret all values as integers. Much more memory efficient than reading in strings.
+vector<vector<int>> read_csv_int(string filename){
+    vector<vector<int>> result;
+    ifstream myFile(filename); // Create an input filestream
+    if(!myFile.is_open()) throw runtime_error("Could not open file"); // Make sure the file is open
+    string line, attribute; // Helper vars
+    if(myFile.good())
+    {
+        while(getline(myFile, line)){ // Extract the first line in the file
+            vector<int> row;
+            stringstream ss(line); // Create a stringstream from line
+            while(getline(ss, attribute, ',')){ // Extract each column name
+                row.push_back(stoi(attribute)); // Push attributes to row
+            }
+            result.push_back(row); //Push rows to the result vector
+        }
+    }
+    myFile.close(); // Close file
+    return result;
+}
+
+//read lines from any file
+vector<string> read_lines(string filename){
+    vector<string> result;
+    ifstream myFile(filename); // Create an input filestream
+    if(!myFile.is_open()) throw runtime_error("Could not open file"); // Make sure the file is open
+    string line, attribute; // Helper vars
+    if(myFile.good())
+    {
+        while(getline(myFile, line)){ // Extract the first line in the file
+            result.push_back(line); //Push rows to the result vector
+        }
+    }
+    myFile.close(); // Close file
+    return result;
+}
+
+//Return dictionary that maps the input vector of strings to indices based on their order
+unordered_map<string, int> make_dict(vector<string> vocab){
+    unordered_map<string, int> result;
+    for(int i=0; i<vocab.size(); i++){
+        result[vocab[i]] = i;
+    }
+    return result;
+}
+
+//Return dictionary that maps the input vector of strings to indices based on their order with an added offset
+unordered_map<string, int> make_dict(vector<string> vocab, int offset){
+    unordered_map<string, int> result;
+    for(int i=0; i<vocab.size(); i++){
+        result[vocab[i]] = i+offset;
+    }
+    return result;
+}
+
 //Print 2 dimensional dataframe
 void printDataFrame(vector<vector<string>> data){
     for(int i=0; i<data.size(); i++){

@@ -1,6 +1,9 @@
 all:   # Add new files to this target's compil chain
 	g++ -o Main main.cpp node.cpp node.h pythonpp.cpp pythonpp.h  tree.cpp tree.h 
 
+debug:
+	g++ -o main.out main.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17
+
 rf: #Compile files for Random Forest
 	g++ pythonpp.h pythonpp.cpp randomForest.cpp randomForest.h tree.cpp tree.h node.cpp node.h chisqr.c chisqr.h gamma.c gamma.h -o rfTest.o -g -std=gnu++17
 

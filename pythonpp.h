@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <random>
 #include <vector>
+#include <unordered_map>
 #include <utility> // pair
 #include <stdexcept> // runtime_error
 #include <sstream> // stringstream
@@ -21,6 +22,14 @@ using namespace std;
 // };
 
 vector<vector<string>> read_csv(string filename);
+
+vector<vector<int>> read_csv_int(string filename);
+
+vector<string> read_lines(string filename);
+
+unordered_map<string, int> make_dict(vector<string> vocab);
+
+unordered_map<string, int> make_dict(vector<string> vocab, int offset);
 
 void printDataFrame(vector<vector<string>> data);
 
