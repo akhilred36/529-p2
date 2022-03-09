@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+#CSV files
+*.csv
+
+#Cygwin dumps
+*.stackdump
+
+#VSCode workspace
+*.vscode
