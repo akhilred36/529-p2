@@ -1,6 +1,8 @@
 all:   # Add new files to this target's compil chain
 	g++ -o Main main.cpp node.cpp node.h pythonpp.cpp pythonpp.h  tree.cpp tree.h 
 
+preprocess:
+	g++ -o preprocess.out preprocess.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17 && rm *.vec && rm *.mtx
 debug:
 	g++ -o main.out main.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17
 

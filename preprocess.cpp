@@ -8,6 +8,7 @@
 #include <stdexcept> // runtime_error
 #include <sstream> // stringstream
 #include <time.h>
+#include<math.h>
 #include<chrono>
 #include<array>
 #include "pythonpp.h"
@@ -15,34 +16,15 @@
 
 using namespace std;
 
-void writeIntArrayToFile(array<int> arr, ofstream file) {
-    for (int i = 0; i < arr.size(); i++) {
-        if (i < arr.size() - 1) {
-            file << arr[i] << ",";
-        } else {
-            file << arr[i];
-        }
-        
-    }
-}
-
-void writeIntMatrixToFile(array<int> arr, ofstream file) {
-    for (int i = 0; i < arr.size(); i++) {
-        if (i < arr.size() - 1) {
-            file << arr[i] << ",";
-        } else {
-            file << arr[i];
-        }
-        
-    }
-}
-
 int main(){
-    vector<vector<int>> data;
+    vector<vector<int>> data_initial;
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-    data = read_csv_int("../training.csv");
+    data_initial = read_csv_int("../training.csv");
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
     std::cout << "Time to read file = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
+
+    vector<vector<int>> data_almost = seperateTargets(data_initial, 0).first;
+    vector<vector<int>> data = seperateHeader(data_almost).second;
 
     vector<string> vocab;
     vocab = read_lines("../vocabulary.txt");
@@ -51,51 +33,80 @@ int main(){
     label_vocab = read_lines("../newsgrouplabels.txt");
 
     // Constants
-    const int NUMBER_OF_CLASSES = (int) label_vocab.size();
-    const int NUMBER_OF_UNIQUE_WORDS = (int) vocab.size(); 
+    const int number_of_classes = label_vocab.size();
+    const int number_of_unique_words = vocab.size(); 
 
 
     // File to store vector containing total word counts per class
     ofstream rawCountFile;
     rawCountFile.open("rawCount.vec");
-    array<int, NUMBER_OF_CLASSES> rawCount;
-    rawCount.fill(0);
+    vector<int> rawCount(number_of_classes, 0);
 
     // File to store matrix of word to count frequencies
-    ofstream wordToClassCount;
-    wordToClassCount.open("wordToClassCount.mtx");
-    array<array<int, NUMBER_OF_UNIQUE_WORDS>, NUMBER_OF_CLASSES> wordToClassCount;
-    
-    for (int i = 0; i < NUMBER_OF_CLASSES; i++) {
-        wordToClassCount[i].fill(0);
+    ofstream wordToClassCountFile;
+    wordToClassCountFile.open("wordToClassCount.mtx");
+    vector<vector<int>> wordToClassCount;
+
+    for(int i=0; i<number_of_classes; i++){
+        vector<int> temp(number_of_unique_words, 0);
+        wordToClassCount.push_back(temp);
     }
 
     // File to store vector containing total representation for each class
     ofstream classRepresentationFile;
     classRepresentationFile.open("classRepresentation.vec");
-    array<int, NUMBER_OF_CLASSES> classRepresentation;
-    classRepresentation.fill(0);
+    vector<int> classRepresentation(number_of_classes, 0);
 
+    cout << 0 << endl;
+    int _class;
 
-    // Gathher the data 
+    // Gather the data 
     for (int i = 0; i < data.size(); i++) {
-        int _class = data.at(i).at((int) data.at(i).size() - 1);
-        classRepresentation[_class - 1] += 1;
-        for (int j = 0; j < data.at(i).size(); i++) {
-            wordToClassCount[_class - 1][j] += data.at(i).at(j);
-            rawCount[_class - 1] += data.at(i).at(j);
+        _class = data.at(i).at((int) data.at(i).size() - 1);
+        classRepresentation.at(_class - 1) += 1;
+        for (int j = 0; j < data.at(i).size() - 1; j++) {
+            wordToClassCount.at(_class - 1).at(j) += data.at(i).at(j);
+            rawCount.at(_class - 1) += data.at(i).at(j);
         }
     }
+    cout << 1 << endl;
 
     // Write To File
-    writeIntArrayToFile(rawCount, rawCountFile);
-    writeIntArrayToFile(classRepresentation, classRepresentationFile);
-
+    writeIntVectorToFile(rawCount, rawCountFile);
+    cout << 2 << endl;
+    writeIntVectorToFile(classRepresentation, classRepresentationFile);
+    cout << 3 << endl;
+    writeIntMatrixToFile(wordToClassCount, wordToClassCountFile);
+    cout << 4 << endl;
 
     // Close Files
     rawCountFile.close();
-    wordToClassCount.close();
+    wordToClassCountFile.close();
     classRepresentationFile.close();
+
+
+    //Write log probability matrix to a file
+    vector<vector<double>> logProbabilityMatrix;
+
+    for(int i=0; i<wordToClassCount.size(); i++){
+        vector<double> temp(wordToClassCount.at(i).size(), 0);
+        logProbabilityMatrix.push_back(temp); 
+    }   
+
+    for(int i=0; i<wordToClassCount.size(); i++){
+        vector<double> temp;
+        for(int j=0; j<wordToClassCount.at(i).size(); j++){
+            double prob = (double) (wordToClassCount.at(i).at(j) + 1)/ (double) rawCount.at(i);
+            double logProb = log2(prob);
+            temp.push_back(logProb);
+        }
+        logProbabilityMatrix.push_back(temp);
+    }
+
+    ofstream logProbMatrixFile;
+    logProbMatrixFile.open("logProbMatrix.mtx");
+    writeDoubleMatrixToFile(logProbabilityMatrix, logProbMatrixFile);
+    logProbMatrixFile.close();
 
     return 0;
 }
