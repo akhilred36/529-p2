@@ -37,5 +37,9 @@
 #Cygwin dumps
 *.stackdump
 
+#Custom intermediate files
+*.vec
+*.mtx
+
 #VSCode workspace
 *.vscode

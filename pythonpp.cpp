@@ -59,6 +59,27 @@ vector<vector<int>> read_csv_int(string filename){
     return result;
 }
 
+//Read a csv file and interpret all values as integers. Much more memory efficient than reading in strings.
+vector<vector<double>> read_csv_double(string filename){
+    vector<vector<double>> result;
+    ifstream myFile(filename); // Create an input filestream
+    if(!myFile.is_open()) throw runtime_error("Could not open file"); // Make sure the file is open
+    string line, attribute; // Helper vars
+    if(myFile.good())
+    {
+        while(getline(myFile, line)){ // Extract the first line in the file
+            vector<double> row;
+            stringstream ss(line); // Create a stringstream from line
+            while(getline(ss, attribute, ',')){ // Extract each column name
+                row.push_back(stod(attribute)); // Push attributes to row
+            }
+            result.push_back(row); //Push rows to the result vector
+        }
+    }
+    myFile.close(); // Close file
+    return result;
+}
+
 //read lines from any file
 vector<string> read_lines(string filename){
     vector<string> result;
@@ -73,6 +94,58 @@ vector<string> read_lines(string filename){
     }
     myFile.close(); // Close file
     return result;
+}
+
+vector<int> read_vec_int(string filename){
+    vector<int> result;
+    result = read_csv_int(filename).at(0);
+    return result;
+}
+
+vector<double> read_vec_double(string filename){
+    vector<double> result;
+    result = read_csv_double(filename).at(0);
+    return result;
+}   
+
+//Write an integer vector to a file
+void writeIntVectorToFile(vector<int> arr, ofstream& file) {
+    for (int i = 0; i < arr.size(); i++) {
+        if (i < arr.size() - 1) {
+            file << arr[i] << ",";
+        } else {
+            file << arr[i];
+        }
+        
+    }
+}
+
+//Write an integer matrix to a file
+void writeIntMatrixToFile(vector<vector<int>> arr, ofstream& file) {
+    for(vector<int> item : arr){
+        writeIntVectorToFile(item, file);
+        file << endl;
+    }
+}
+
+//Write an Double vector to a file
+void writeDoubleVectorToFile(vector<double> arr, ofstream& file) {
+    for (int i = 0; i < arr.size(); i++) {
+        if (i < arr.size() - 1) {
+            file << arr[i] << ",";
+        } else {
+            file << arr[i];
+        }
+        
+    }
+}
+
+//Write an double matrix to a file
+void writeDoubleMatrixToFile(vector<vector<double>> arr, ofstream& file) {
+    for(vector<double> item : arr){
+        writeDoubleVectorToFile(item, file);
+        file << endl;
+    }
 }
 
 //Return dictionary that maps the input vector of strings to indices based on their order
@@ -132,11 +205,49 @@ pair<vector<vector<string>>, vector<string>> seperateTargets(vector<vector<strin
     return result;
 }
 
+//Separate attributes from target and return as a pair
+pair<vector<vector<int>>, vector<int>> seperateTargets(vector<vector<int>> data, int targetIndex){
+    pair<vector<vector<int>>, vector<int>> result;
+    vector<int> targets;
+    for(int i=0; i<data.size(); i++){
+        vector<int> row;
+        for(int j=0; j<data.at(i).size(); j++){
+            if(j == targetIndex){
+                targets.push_back(data.at(i).at(j));
+            }
+            else{
+                row.push_back(data.at(i).at(j));
+            }
+        }
+        result.first.push_back(row);
+    }
+    result.second = targets;
+    return result;
+}
+
 //Separate column headers and return as a pair
 pair<vector<string>, vector<vector<string>>> seperateHeader(vector<vector<string>> data){
     pair<vector<string>, vector<vector<string>>> result;
     for(int i=0; i<data.size(); i++){
         vector<string> row;
+        for(int j=0; j<data.at(i).size(); j++){
+            row.push_back(data.at(i).at(j));
+        }
+        if(i == 0){
+            result.first = row;
+        }
+        else{
+            result.second.push_back(row);
+        }
+    }
+    return result;
+}
+
+//Separate column headers and return as a pair
+pair<vector<int>, vector<vector<int>>> seperateHeader(vector<vector<int>> data){
+    pair<vector<int>, vector<vector<int>>> result;
+    for(int i=0; i<data.size(); i++){
+        vector<int> row;
         for(int j=0; j<data.at(i).size(); j++){
             row.push_back(data.at(i).at(j));
         }
