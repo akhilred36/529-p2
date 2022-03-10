@@ -41,6 +41,12 @@ void writeDoubleVectorToFile(vector<double> arr, ofstream& file);
 
 void writeDoubleMatrixToFile(vector<vector<double>> arr, ofstream& file);
 
+void write_csv(vector<vector<int>> input, string filename);
+
+void write_csv(vector<vector<double>> input, string filename);
+
+void write_csv(vector<vector<string>> input, string filename);
+
 unordered_map<string, int> make_dict(vector<string> vocab);
 
 unordered_map<string, int> make_dict(vector<string> vocab, int offset);

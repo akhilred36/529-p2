@@ -85,28 +85,28 @@ int main(){
     classRepresentationFile.close();
 
 
-    //Write log probability matrix to a file
-    vector<vector<double>> logProbabilityMatrix;
+    // //Write log probability matrix to a file
+    // vector<vector<double>> logProbabilityMatrix;
 
-    for(int i=0; i<wordToClassCount.size(); i++){
-        vector<double> temp(wordToClassCount.at(i).size(), 0);
-        logProbabilityMatrix.push_back(temp); 
-    }   
+    // for(int i=0; i<wordToClassCount.size(); i++){
+    //     vector<double> temp(wordToClassCount.at(i).size(), 0);
+    //     logProbabilityMatrix.push_back(temp); 
+    // }   
 
-    for(int i=0; i<wordToClassCount.size(); i++){
-        vector<double> temp;
-        for(int j=0; j<wordToClassCount.at(i).size(); j++){
-            double prob = (double) (wordToClassCount.at(i).at(j) + 1)/ (double) rawCount.at(i);
-            double logProb = log2(prob);
-            temp.push_back(logProb);
-        }
-        logProbabilityMatrix.push_back(temp);
-    }
+    // for(int i=0; i<wordToClassCount.size(); i++){
+    //     vector<double> temp;
+    //     for(int j=0; j<wordToClassCount.at(i).size(); j++){
+    //         double prob = (double) (wordToClassCount.at(i).at(j) + 1)/ (double) rawCount.at(i);
+    //         double logProb = log2(prob);
+    //         temp.push_back(logProb);
+    //     }
+    //     logProbabilityMatrix.push_back(temp);
+    // }
 
-    ofstream logProbMatrixFile;
-    logProbMatrixFile.open("logProbMatrix.mtx");
-    writeDoubleMatrixToFile(logProbabilityMatrix, logProbMatrixFile);
-    logProbMatrixFile.close();
+    // ofstream logProbMatrixFile;
+    // logProbMatrixFile.open("logProbMatrix.mtx");
+    // writeDoubleMatrixToFile(logProbabilityMatrix, logProbMatrixFile);
+    // logProbMatrixFile.close();
 
     return 0;
 }

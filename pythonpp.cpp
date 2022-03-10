@@ -148,6 +148,54 @@ void writeDoubleMatrixToFile(vector<vector<double>> arr, ofstream& file) {
     }
 }
 
+//Write a 2d vector to a csv file
+void write_csv(vector<vector<int>> input, string filename){
+    ofstream file1;
+    file1.open("filename");
+    for(int i=0; i<input.size(); i++){
+        for(int j=0; j<input.at(i).size(); j++){
+            if(j == input.at(i).size() - 1){
+                file1 << input.at(i).at(j) << endl;
+            }
+            else{
+                file1 << input.at(i).at(j) << ",";
+            }
+        }
+    }
+}
+
+//Write a 2d vector to a csv file
+void write_csv(vector<vector<double>> input, string filename){
+    ofstream file1;
+    file1.open("filename");
+    for(int i=0; i<input.size(); i++){
+        for(int j=0; j<input.at(i).size(); j++){
+            if(j == input.at(i).size() - 1){
+                file1 << input.at(i).at(j) << endl;
+            }
+            else{
+                file1 << input.at(i).at(j) << ",";
+            }
+        }
+    }
+}
+
+//Write a 2d vector to a csv file
+void write_csv(vector<vector<string>> input, string filename){
+    ofstream file1;
+    file1.open("filename");
+    for(int i=0; i<input.size(); i++){
+        for(int j=0; j<input.at(i).size(); j++){
+            if(j == input.at(i).size() - 1){
+                file1 << input.at(i).at(j) << endl;
+            }
+            else{
+                file1 << input.at(i).at(j) << ",";
+            }
+        }
+    }
+}
+
 //Return dictionary that maps the input vector of strings to indices based on their order
 unordered_map<string, int> make_dict(vector<string> vocab){
     unordered_map<string, int> result;
