@@ -63,8 +63,8 @@ class NaiveBayes {
                 alpha = 1 + b;
                 cout << "Alpha: " << alpha << endl;
             } else {
-                beta = 1.0/vocab.size();
-                alpha = 1 + b;
+                beta = (1.0/(double) vocab.size());
+                alpha = 1 + beta;
                 cout << "Alpha: " << alpha << endl;
             }
             
@@ -96,7 +96,8 @@ class NaiveBayes {
             chrono::steady_clock::time_point begin1;
             chrono::steady_clock::time_point end1;
             begin = chrono::steady_clock::now();
-            vector<vector<int>> data = seperateHeader(read_csv_int(file)).second;
+            //vector<vector<int>> data = seperateHeader(read_csv_int(file)).second;
+            vector<vector<int>> data = read_csv_int(file);
             end = chrono::steady_clock::now();
             std::cout << "Time to read file = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
             begin = chrono::steady_clock::now();
@@ -183,17 +184,15 @@ class NaiveBayes {
                 currVal = classProbabilities[i];
 
                 for (int j = 0; j < features.size(); j++) {
-                    if (countMatrix.at(i).at(j) > 0) {
-                        currVal = currVal + (countMatrix.at(i).at(j)  * probMatrix.at(i).at(j));
+                    if (features.at(j) > 0) {
+                        currVal = currVal + (((double) features.at(j))  * probMatrix.at(i).at(j));
                     }
                 }
-
                 if (currVal > maxVal) {
                     maxVal = currVal;
                     maxIndex = i;
                 }
             }
-            cout << "Max value: " << maxVal << endl;
             return maxIndex + 1;
         }
 
