@@ -3,6 +3,13 @@ all:   # Add new files to this target's compil chain
 
 preprocess:
 	g++ -o preprocess.out preprocess.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17 && rm *.vec && rm *.mtx
+
+build_nb:
+	g++ -o Main main.cpp pythonpp.cpp pythonpp.h chisqr.c chisqr.h gamma.c gamma.h -std=gnu++17 -g NaiveBayesClassifier.h 
+
+run_nb:
+	./Main wordToClassCount.mtx testing.csv -1.0
+
 debug:
 	g++ -o main.out main.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17
 

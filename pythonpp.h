@@ -126,4 +126,3 @@ void print(long s);
 void print(bool s);
 
 void println(bool s);
-
