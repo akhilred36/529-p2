@@ -11,12 +11,27 @@
 #include<chrono>
 //#include <stdlib.h>
 #include "pythonpp.h"
-
+#include "NaiveBayesClassifier.h"
 
 using namespace std;
 
 
-int main(){
+int main(int argc, char** argv){
+    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+    cout << argv[1] << endl << argv[2] << endl << argv[3] << endl;
+    double fd = atof(argv[3]); //"wordToClassCount.mtx"
+    NaiveBayes test(argv[1], fd);
+
+    chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    std::cout << "Time to train model = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
+
+    begin = chrono::steady_clock::now();
+
+    test.testModel(argv[2], true);
+
+    end = chrono::steady_clock::now();
+    std::cout << "Time to predict = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
+
     // vector<vector<int>> data;
     // chrono::steady_clock::time_point begin = chrono::steady_clock::now();
     // data = read_csv_int("../training.csv");
@@ -36,7 +51,7 @@ int main(){
     // cout << "The index of " << label_vocab[15] << " is " << label_vocab_dict[label_vocab[15]] << endl;
 
     //Read in logProbMatrix
-    vector<vector<double>> logProbMatrix;
-    logProbMatrix = read_csv_double("logProbMatrix.mtx");
+    // vector<vector<double>> logProbMatrix;
+    // logProbMatrix = read_csv_double("logProbMatrix.mtx");
     return 0;
 }

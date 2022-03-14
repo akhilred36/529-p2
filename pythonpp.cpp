@@ -748,6 +748,8 @@ bool chiSquaredTest(vector<vector<string>> parentData, int attribute, double con
     else return false;
 }
 
+/*
+
 //Return vector of vector of attributes that have randomly sampled (with replacement) features. Includes target
 vector<vector<int>> bagFeaturesIndices(vector<vector<string>> dataset, int target, int numBags, int minFeatureSize){
     vector<vector<int>> selectedAttributes;
@@ -766,6 +768,8 @@ vector<vector<int>> bagFeaturesIndices(vector<vector<string>> dataset, int targe
     }
     return selectedAttributes;
 }
+
+
 
 //Return vector of datasets that have randomly sampled (with replacement) features
 //Incomplete
@@ -786,7 +790,7 @@ vector<vector<vector<string>>> bagFeatures(vector<vector<string>> dataset, vecto
     }
     return result;
 }
-
+*/
 //Print wrappers - polymorphism for various data types
 void println(string s){
     cout << s << endl;
@@ -843,4 +847,5 @@ void println(bool s){
 void print(bool s){
     cout << s;
 }
+
 

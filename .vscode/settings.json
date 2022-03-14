@@ -4,6 +4,11 @@
         "vector": "cpp",
         "array": "cpp",
         "iosfwd": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "random": "cpp",
+        "cmath": "cpp",
+        "chrono": "cpp"
     }
 }
