@@ -8,6 +8,7 @@
 #include <stdexcept> // runtime_error
 #include <sstream> // stringstream
 #include <time.h>
+#include <chrono>
 #include <stdlib.h>
 #include <math.h>  
 #include <unordered_map>
@@ -60,9 +61,11 @@ class NaiveBayes {
             if (beta > 0) {
                 beta = b;
                 alpha = 1 + b;
+                cout << "Alpha: " << alpha << endl;
             } else {
                 beta = 1.0/vocab.size();
                 alpha = 1 + b;
+                cout << "Alpha: " << alpha << endl;
             }
             
 
@@ -88,22 +91,29 @@ class NaiveBayes {
         }
 
         void testModel(string file, bool produceSubmissionFile) {
-            cout << "nj" << endl;
+            chrono::steady_clock::time_point begin;
+            chrono::steady_clock::time_point end;
+            chrono::steady_clock::time_point begin1;
+            chrono::steady_clock::time_point end1;
+            begin = chrono::steady_clock::now();
             vector<vector<int>> data = seperateHeader(read_csv_int(file)).second;
-            cout << "i9" << endl;
+            end = chrono::steady_clock::now();
+            std::cout << "Time to read file = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+            begin = chrono::steady_clock::now();
             if (produceSubmissionFile) {
                 data = seperateTargets(data, 0).first;
-                data = seperateTargets(data, data.at(0).size()).first;
-
-                cout << "JIHK" << endl;
+                // data = seperateTargets(data, data.at(0).size()).first;
 
                 // Crete submission file
                 ofstream submission;
                 submission.open("submission.csv");
                 submission << "id,class" << endl;
-                for (int i = 0; i < 1/*data.size()*/; i++) {
+                begin1 = chrono::steady_clock::now();
+                for (int i = 0; i < data.size(); i++) {
                     submission << 12001 + i << "," << predict(data.at(i)) << endl;
                 }
+                end1 = chrono::steady_clock::now();
+                std::cout << "Time to predict = " << std::chrono::duration_cast<std::chrono::milliseconds>(end1 - begin1).count() << "[ms]" << std::endl;
                 submission.close();
             } else {
                 data = seperateTargets(data, 0).first;
@@ -126,8 +136,9 @@ class NaiveBayes {
 
                 record << "Total: " << total << endl << "Correct: " << correct << endl << "Accuracy: " << (correct/total) * 100 << "%" << endl;
                 record.close();
-            }   
-            
+            }
+            end = chrono::steady_clock::now();
+            std::cout << "Total time to predict classes = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;     
         }
         
 
@@ -143,14 +154,23 @@ class NaiveBayes {
             for (int i = 0; i < countMatrix.size(); i++) {
                 for (int j = 0; j < countMatrix.at(i).size(); j++) {
                     probMatrix.at(i).at(j) = (countMatrix.at(i).at(j) + (alpha - 1)) / ((double) rawCount.at(i) + ((alpha - 1) * vocab.size()));
+                    if(probMatrix.at(i).at(j) <= 0){
+                        cout << "prob is: " << probMatrix.at(i).at(j) << endl;
+                    }
                     probMatrix.at(i).at(j) = log2(probMatrix.at(i).at(j));
                 }
             }
+            cout << "Length of outer vector: " << probMatrix.size() << endl;
+            cout << "Length of inner vector: " << probMatrix.at(0).size() << endl;
+            ofstream file;
+            file.open("probMatrix.mtx");
+            writeDoubleMatrixToFile(probMatrix, file);
+            file.close();
         }
 
         int predict(vector<int> features) {
             int maxIndex = 0;
-            double maxVal = classProbabilities[0];
+            double maxVal = 0;
 
             for (int i = 0; i < features.size(); i++) {
                 if (countMatrix.at(0).at(i) > 0) {
@@ -164,7 +184,7 @@ class NaiveBayes {
 
                 for (int j = 0; j < features.size(); j++) {
                     if (countMatrix.at(i).at(j) > 0) {
-                        maxVal = maxVal + (countMatrix.at(i).at(j)  * probMatrix.at(i).at(j));
+                        currVal = currVal + (countMatrix.at(i).at(j)  * probMatrix.at(i).at(j));
                     }
                 }
 
@@ -173,8 +193,8 @@ class NaiveBayes {
                     maxIndex = i;
                 }
             }
-            cout << "JJJJ" << endl;
-            return maxIndex;
+            cout << "Max value: " << maxVal << endl;
+            return maxIndex + 1;
         }
 
         
