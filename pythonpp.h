@@ -65,7 +65,11 @@ pair<vector<string>, vector<vector<string>>> seperateHeader(vector<vector<string
 
 vector<vector<string>> shuffleDataFrame(vector<vector<string>> data);
 
+vector<vector<int>> shuffleDataFrame(vector<vector<int>> data);
+
 pair<vector<vector<string>>, vector<vector<string>>> train_test_split(vector<vector<string>> data, float trainRatio);
+
+pair<vector<vector<int>>, vector<vector<int>>> train_test_split(vector<vector<int>> data, float trainRatio);
 
 vector<vector<vector<string>>> attribute_based_split(vector<vector<string>> data, int attribute, vector<string> values);
 

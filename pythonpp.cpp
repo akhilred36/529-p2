@@ -151,7 +151,7 @@ void writeDoubleMatrixToFile(vector<vector<double>> arr, ofstream& file) {
 //Write a 2d vector to a csv file
 void write_csv(vector<vector<int>> input, string filename){
     ofstream file1;
-    file1.open("filename");
+    file1.open(filename);
     for(int i=0; i<input.size(); i++){
         for(int j=0; j<input.at(i).size(); j++){
             if(j == input.at(i).size() - 1){
@@ -167,7 +167,7 @@ void write_csv(vector<vector<int>> input, string filename){
 //Write a 2d vector to a csv file
 void write_csv(vector<vector<double>> input, string filename){
     ofstream file1;
-    file1.open("filename");
+    file1.open(filename);
     for(int i=0; i<input.size(); i++){
         for(int j=0; j<input.at(i).size(); j++){
             if(j == input.at(i).size() - 1){
@@ -183,7 +183,7 @@ void write_csv(vector<vector<double>> input, string filename){
 //Write a 2d vector to a csv file
 void write_csv(vector<vector<string>> input, string filename){
     ofstream file1;
-    file1.open("filename");
+    file1.open(filename);
     for(int i=0; i<input.size(); i++){
         for(int j=0; j<input.at(i).size(); j++){
             if(j == input.at(i).size() - 1){
@@ -316,9 +316,32 @@ vector<vector<string>> shuffleDataFrame(vector<vector<string>> data){
     return data;
 }
 
+//Shuffle dataframe
+vector<vector<int>> shuffleDataFrame(vector<vector<int>> data){
+    auto rng = default_random_engine {};
+    shuffle(data.begin(), data.end(), rng);
+    return data;
+}
+
+
 //Split dataframe into train and test based on trainRatio(between 0 and 1)
 pair<vector<vector<string>>, vector<vector<string>>> train_test_split(vector<vector<string>> data, float trainRatio){
     pair<vector<vector<string>>, vector<vector<string>>> result;
+    int lastTrainIdx = (int) (trainRatio * (float) data.size());
+    for(int i=0; i<data.size(); i++){
+        if(i < lastTrainIdx){
+            result.first.push_back(data.at(i));
+        }
+        else{
+            result.second.push_back(data.at(i));
+        }
+    }
+    return result;
+}
+
+//Split dataframe into train and test based on trainRatio(between 0 and 1)
+pair<vector<vector<int>>, vector<vector<int>>> train_test_split(vector<vector<int>> data, float trainRatio){
+    pair<vector<vector<int>>, vector<vector<int>>> result;
     int lastTrainIdx = (int) (trainRatio * (float) data.size());
     for(int i=0; i<data.size(); i++){
         if(i < lastTrainIdx){
