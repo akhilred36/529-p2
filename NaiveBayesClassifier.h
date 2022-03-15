@@ -51,14 +51,14 @@ class NaiveBayes {
         // Vector containing total representation for each class
         vector<int> classRepresentation;
 
-        NaiveBayes(string file, double b) {
+        NaiveBayes(string file, string vocab_file, string labels_file, double b) {
             countMatrix = read_csv_int(file);
 
             // Load labels and vocab from files
-            vocab = read_lines("vocabulary.txt");
-            label_vocab = read_lines("newsgrouplabels.txt");
+            vocab = read_lines(vocab_file);
+            label_vocab = read_lines(labels_file);
 
-            if (beta > 0) {
+            if (b > 0) {
                 beta = b;
                 alpha = 1 + b;
                 cout << "Alpha: " << alpha << endl;
