@@ -43,3 +43,6 @@
 
 #VSCode workspace
 *.vscode
+
+#Text files
+scores/*.txt
