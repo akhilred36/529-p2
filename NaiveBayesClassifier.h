@@ -51,14 +51,14 @@ class NaiveBayes {
         // Vector containing total representation for each class
         vector<int> classRepresentation;
 
-        NaiveBayes(string file, double b) {
+        NaiveBayes(string file, string vocab_file, string labels_file, double b) {
             countMatrix = read_csv_int(file);
 
             // Load labels and vocab from files
-            vocab = read_lines("vocabulary.txt");
-            label_vocab = read_lines("newsgrouplabels.txt");
+            vocab = read_lines(vocab_file);
+            label_vocab = read_lines(labels_file);
 
-            if (beta > 0) {
+            if (b > 0) {
                 beta = b;
                 alpha = 1 + b;
                 cout << "Alpha: " << alpha << endl;
@@ -96,7 +96,6 @@ class NaiveBayes {
             chrono::steady_clock::time_point begin1;
             chrono::steady_clock::time_point end1;
             begin = chrono::steady_clock::now();
-            //vector<vector<int>> data = seperateHeader(read_csv_int(file)).second;
             vector<vector<int>> data = read_csv_int(file);
             end = chrono::steady_clock::now();
             std::cout << "Time to read file = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
@@ -118,8 +117,8 @@ class NaiveBayes {
                 submission.close();
             } else {
                 data = seperateTargets(data, 0).first;
-                vector<int> Y = seperateTargets(data, data.at(0).size()).second;
-                data = seperateTargets(data, data.at(0).size()).first;
+                vector<int> Y = seperateTargets(data, data.at(0).size() - 1).second;
+                data = seperateTargets(data, data.at(0).size() - 1).first;
 
                 // Crete file to rec
                 ofstream record;
