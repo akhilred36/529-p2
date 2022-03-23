@@ -44,3 +44,6 @@
 #VSCode workspace
 *.vscode
 last_run_info.txt
+
+#Text files
+scores/*.txt
