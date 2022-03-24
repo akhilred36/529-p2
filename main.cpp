@@ -12,27 +12,19 @@
 //#include <stdlib.h>
 #include "pythonpp.h"
 #include "NaiveBayesClassifier.h"
+#include "logisticRegressionClassifier.h"
 
 using namespace std;
 
 
 int main(int argc, char** argv){
-    if(argc < 6){
-        cerr << "Usage: " << argv[0] << " <countMatrix.mtx> <vocab.txt> <labels.txt> <testFile.csv> <betaValue>" << endl;
-        return 0;
+    if(argv[0] == "nb"){
+        return runNB(argc, argv);
     }
-    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-    NaiveBayes test(argv[1], argv[2], argv[3], atof(argv[5]));
-
-    chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    std::cout << "Time to train model = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
-
-    begin = chrono::steady_clock::now();
-
-    test.testModel(argv[4], true);
-
-    end = chrono::steady_clock::now();
-    std::cout << "Total time for reading and predicting = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
-    
-    return 0;
+    else if(argv[0] == "lr"){
+        return runLR(argc, argv);
+    }
+    else{
+        cerr << "Invalid classfier. Options are 'lr' or 'nb'" << endl;
+    }    
 }

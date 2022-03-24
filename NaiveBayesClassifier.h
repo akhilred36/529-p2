@@ -197,3 +197,23 @@ class NaiveBayes {
 
         
 };
+
+int runNB(int argc, char** argv) {
+    if(argc < 7){
+        cerr << "Usage: " << argv[0] << " <countMatrix.mtx> <vocab.txt> <labels.txt> <testFile.csv> <betaValue>" << endl;
+        return 0;
+    }
+    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+    NaiveBayes test(argv[2], argv[3], argv[4], atof(argv[6]));
+
+    chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    std::cout << "Time to train model = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+
+    begin = chrono::steady_clock::now();
+
+    test.testModel(argv[5], true);
+
+    end = chrono::steady_clock::now();
+    std::cout << "Total time for reading and predicting = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
+    return 0;
+}

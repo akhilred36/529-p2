@@ -4,11 +4,17 @@ all:   # Add new files to this target's compil chain
 preprocess:
 	g++ -o preprocess.out preprocess.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17 && rm *.vec && rm *.mtx
 
+build:
+	g++ -I eigen/ main.cpp pythonpp.cpp pythonpp.h chisqr.c chisqr.h gamma.c gamma.h -std=gnu++17 -g logisticRegressionClassifier.h NaiveBayesClassifier.h -o main.out
+
 build_nb:
 	g++ -o main.out main.cpp pythonpp.cpp pythonpp.h chisqr.c chisqr.h gamma.c gamma.h -std=gnu++17 -g NaiveBayesClassifier.h 
 
 run_nb:
 	./main.out wordToClassCount.mtx ../vocabulary.txt ../newsgrouplabels.txt ../testing.csv 0.0001
+
+build_lr:
+	g++ -I eigen/ main.cpp pythonpp.cpp pythonpp.h chisqr.c chisqr.h gamma.c gamma.h -std=gnu++17 -g logisticRegressionClassifier.h -o main.out
 
 debug:
 	g++ -o main.out main.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17

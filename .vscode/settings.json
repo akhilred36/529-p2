@@ -11,5 +11,6 @@
         "cmath": "cpp",
         "chrono": "cpp",
         "iostream": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }
