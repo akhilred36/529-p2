@@ -16,26 +16,56 @@
 
 using namespace std;
 
-int main(){
+int main(int argc, char * argv[]){
+
+    if(argc < 5){
+        cerr << "Usage: " << argv[0] << " <trainFile.csv> <vocabulary.txt> <groupLabels.txt> <trainSplitRatio>" << endl;
+        return 0;
+    }
+
+    cout << "Reading " << argv[1] << " ...." << endl;
     vector<vector<int>> data_initial;
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-    data_initial = read_csv_int("../training.csv");
+    data_initial = read_csv_int((string) argv[1]);
     chrono::steady_clock::time_point end = chrono::steady_clock::now();
     std::cout << "Time to read file = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
 
-    vector<vector<int>> data_almost = seperateTargets(data_initial, 0).first;
-    vector<vector<int>> data = seperateHeader(data_almost).second;
+    cout << "Preprocessing data ...." << endl;
+    vector<vector<int>> shuffledData = shuffleDataFrame(data_initial);
+    pair<vector<vector<int>>, vector<vector<int>>> train_test = train_test_split(shuffledData, atof(argv[4]));
+
+    vector<vector<int>> data = train_test.first;
+    vector<vector<int>> test_data = train_test.second;
+    data = seperateTargets(data, 0).first;
+    write_csv(test_data, "customTest.csv");
 
     vector<string> vocab;
-    vocab = read_lines("../vocabulary.txt");
+    vocab = read_lines(argv[2]);
 
     vector<string> label_vocab;
-    label_vocab = read_lines("../newsgrouplabels.txt");
+    label_vocab = read_lines(argv[3]);
+
+    //Delta Matrix declaration
+    vector<vector<int>> deltaMatrix;
+
+    //X matrix declaration
+    vector<vector<int>> dataMatrix;
 
     // Constants
     const int number_of_classes = label_vocab.size();
     const int number_of_unique_words = vocab.size(); 
 
+    // File to store Delta matrix
+    ofstream deltaMatrixFile;
+    deltaMatrixFile.open("deltaMatrix.mtx");
+    for(int i=0; i<number_of_classes; i++){
+        vector<int> temp(data.size(), 0);
+        deltaMatrix.push_back(temp);
+    }
+
+    //File to store Data matrix
+    ofstream dataMatrixFile;
+    dataMatrixFile.open("dataMatrix.mtx");
 
     // File to store vector containing total word counts per class
     ofstream rawCountFile;
@@ -57,7 +87,6 @@ int main(){
     classRepresentationFile.open("classRepresentation.vec");
     vector<int> classRepresentation(number_of_classes, 0);
 
-    cout << 0 << endl;
     int _class;
 
     // Gather the data 
@@ -68,22 +97,22 @@ int main(){
             wordToClassCount.at(_class - 1).at(j) += data.at(i).at(j);
             rawCount.at(_class - 1) += data.at(i).at(j);
         }
+        deltaMatrix.at(_class - 1).at(i) = 1;
     }
-    cout << 1 << endl;
 
     // Write To File
     writeIntVectorToFile(rawCount, rawCountFile);
-    cout << 2 << endl;
     writeIntVectorToFile(classRepresentation, classRepresentationFile);
-    cout << 3 << endl;
     writeIntMatrixToFile(wordToClassCount, wordToClassCountFile);
-    cout << 4 << endl;
+    writeIntMatrixToFile(deltaMatrix, deltaMatrixFile);
+    writeIntMatrixToFile(data, dataMatrixFile);
 
     // Close Files
     rawCountFile.close();
     wordToClassCountFile.close();
     classRepresentationFile.close();
-
+    deltaMatrixFile.close();
+    dataMatrixFile.close();
 
     // //Write log probability matrix to a file
     // vector<vector<double>> logProbabilityMatrix;

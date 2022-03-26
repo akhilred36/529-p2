@@ -12,46 +12,19 @@
 //#include <stdlib.h>
 #include "pythonpp.h"
 #include "NaiveBayesClassifier.h"
+#include "logisticRegressionClassifier.h"
 
 using namespace std;
 
 
 int main(int argc, char** argv){
-    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-    cout << argv[1] << endl << argv[2] << endl << argv[3] << endl;
-    double fd = atof(argv[3]); //"wordToClassCount.mtx"
-    NaiveBayes test(argv[1], fd);
-
-    chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    std::cout << "Time to train model = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
-
-    begin = chrono::steady_clock::now();
-
-    test.testModel(argv[2], true);
-
-    end = chrono::steady_clock::now();
-    std::cout << "Time to predict = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
-
-    // vector<vector<int>> data;
-    // chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-    // data = read_csv_int("../training.csv");
-    // chrono::steady_clock::time_point end = chrono::steady_clock::now();
-    // std::cout << "Time to read file = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
-
-    // vector<string> vocab;
-    // unordered_map<string, int> vocab_dict;
-    // vocab = read_lines("../vocabulary.txt");
-    // vocab_dict = make_dict(vocab);
-    // cout << "The index of " << vocab[932] << " is " << vocab_dict[vocab[932]] << endl;
-
-    // vector<string> label_vocab;
-    // unordered_map<string, int> label_vocab_dict;
-    // label_vocab = read_lines("../newsgrouplabels.txt");
-    // label_vocab_dict = make_dict(label_vocab, 1);
-    // cout << "The index of " << label_vocab[15] << " is " << label_vocab_dict[label_vocab[15]] << endl;
-
-    //Read in logProbMatrix
-    // vector<vector<double>> logProbMatrix;
-    // logProbMatrix = read_csv_double("logProbMatrix.mtx");
-    return 0;
+    if(strcmp(argv[1], "nb") == 0){
+        return runNB(argc, argv);
+    }
+    else if(strcmp(argv[1], "lr") == 0){
+        return runLR(argc, argv);
+    }
+    else{
+        cerr << "Invalid classfier. Options are 'lr' or 'nb'" << endl;
+    }    
 }

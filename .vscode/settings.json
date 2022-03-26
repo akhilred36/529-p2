@@ -9,6 +9,9 @@
         "fstream": "cpp",
         "random": "cpp",
         "cmath": "cpp",
-        "chrono": "cpp"
-    }
+        "chrono": "cpp",
+        "iostream": "cpp",
+        "xstring": "cpp"
+    },
+    "cmake.configureOnOpen": false
 }

@@ -1,14 +1,23 @@
 all:   # Add new files to this target's compil chain
-	g++ -o Main main.cpp node.cpp node.h pythonpp.cpp pythonpp.h  tree.cpp tree.h 
+	g++ -o main.out main.cpp node.cpp node.h pythonpp.cpp pythonpp.h  tree.cpp tree.h 
 
 preprocess:
-	g++ -o preprocess.out preprocess.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17 && rm *.vec && rm *.mtx
+	g++ -I eigen/ -o preprocess.out preprocess.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17 && rm *.vec && rm *.mtx
+
+build:
+	g++ -I eigen/ main.cpp pythonpp.cpp pythonpp.h chisqr.c chisqr.h gamma.c gamma.h -std=gnu++17 -g logisticRegressionClassifier.h NaiveBayesClassifier.h -o main.out
 
 build_nb:
-	g++ -o Main main.cpp pythonpp.cpp pythonpp.h chisqr.c chisqr.h gamma.c gamma.h -std=gnu++17 -g NaiveBayesClassifier.h 
+	g++ -I eigen/ -o main.out main.cpp pythonpp.cpp pythonpp.h chisqr.c chisqr.h gamma.c gamma.h -std=gnu++17 -g NaiveBayesClassifier.h 
 
 run_nb:
-	./Main wordToClassCount.mtx testing.csv -1.0
+	./main.out nb wordToClassCount.mtx ../vocabulary.txt ../newsgrouplabels.txt ../testing.csv 0.02
+
+build_lr:
+	g++ -I eigen/ main.cpp pythonpp.cpp pythonpp.h chisqr.c chisqr.h gamma.c gamma.h -std=gnu++17 -g logisticRegressionClassifier.h -o main.out
+
+run_lr:
+	./main.out lr ../training.csv ../vocabulary.txt ../newsgrouplabels.txt
 
 debug:
 	g++ -o main.out main.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17
@@ -20,7 +29,7 @@ runrf: #Run Random Forest executable
 	./rfTest.o && rm rfTest.o
 
 run:
-	./Main && rm Main
+	./main.out && rm main.out
 
 # Each class gets its own target for testing purposes
 node:
