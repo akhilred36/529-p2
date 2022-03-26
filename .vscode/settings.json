@@ -10,7 +10,8 @@
         "random": "cpp",
         "cmath": "cpp",
         "chrono": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "xstring": "cpp"
     },
     "cmake.configureOnOpen": false
 }

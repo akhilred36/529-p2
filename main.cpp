@@ -18,10 +18,10 @@ using namespace std;
 
 
 int main(int argc, char** argv){
-    if(argv[0] == "nb"){
+    if(strcmp(argv[1], "nb") == 0){
         return runNB(argc, argv);
     }
-    else if(argv[0] == "lr"){
+    else if(strcmp(argv[1], "lr") == 0){
         return runLR(argc, argv);
     }
     else{

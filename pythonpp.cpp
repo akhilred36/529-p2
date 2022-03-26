@@ -59,6 +59,27 @@ vector<vector<int>> read_csv_int(string filename){
     return result;
 }
 
+//Read a csv file and interpret all values as integers. Much more memory efficient than reading in strings. Return pointer
+vector<vector<int>> * read_csv_int_p(string filename){
+    vector<vector<int>> * result = new vector<vector<int>>;
+    ifstream myFile(filename); // Create an input filestream
+    if(!myFile.is_open()) throw runtime_error("Could not open file"); // Make sure the file is open
+    string line, attribute; // Helper vars
+    if(myFile.good())
+    {
+        while(getline(myFile, line)){ // Extract the first line in the file
+            vector<int> row;
+            stringstream ss(line); // Create a stringstream from line
+            while(getline(ss, attribute, ',')){ // Extract each column name
+                row.push_back(stoi(attribute)); // Push attributes to row
+            }
+            result->push_back(row); //Push rows to the result vector
+        }
+    }
+    myFile.close(); // Close file
+    return result;
+}
+
 //Read a csv file and interpret all values as integers. Much more memory efficient than reading in strings.
 vector<vector<double>> read_csv_double(string filename){
     vector<vector<double>> result;
@@ -162,6 +183,17 @@ void write_csv(vector<vector<int>> input, string filename){
             }
         }
     }
+}
+
+//Convert 2d vector to eigen matrix
+MatrixXd dfToMatrixInt(vector<vector<int>> data){
+    MatrixXd result((int) data.size(), (int) data.at(0).size());
+    for(int i=0; i< data.size(); i++){
+        for(int j=0; j<data.at(i).size(); j++){
+            result(i, j) = data.at(i).at(j);
+        }
+    }
+    return result;
 }
 
 //Write a 2d vector to a csv file

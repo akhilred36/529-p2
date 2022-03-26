@@ -10,10 +10,12 @@
 #include <sstream> // stringstream
 #include <time.h>
 #include <stdlib.h>
+#include <Eigen/Dense>
 #include "chisqr.h"
 #include "gamma.h"
 
 using namespace std;
+using namespace Eigen;
 
 
 // class DataFrame{
@@ -25,6 +27,8 @@ vector<vector<string>> read_csv(string filename);
 
 vector<vector<int>> read_csv_int(string filename);
 
+vector<vector<int>> * read_csv_int_p (string filename);
+
 vector<vector<double>> read_csv_double(string filename);
 
 vector<int> read_vec_int(string filename);
@@ -32,6 +36,8 @@ vector<int> read_vec_int(string filename);
 vector<double> read_vec_double(string filename);
 
 vector<string> read_lines(string filename);
+
+MatrixXd dfToMatrixInt(vector<vector<int>> data);
 
 void writeIntVectorToFile(vector<int> arr, ofstream& file);
 

@@ -83,7 +83,7 @@ class NaiveBayes {
 
             // Calculate number of documents
             for (int i : classRepresentation) {
-                numberOfDcuments = numberOfDcuments + 1;
+                numberOfDcuments = numberOfDcuments + i;
             }
 
             fillClassProbabilities();
