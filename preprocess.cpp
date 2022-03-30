@@ -36,7 +36,7 @@ int main(int argc, char * argv[]){
 
     vector<vector<int>> data = train_test.first;
     vector<vector<int>> test_data = train_test.second;
-    data = seperateTargets(data, 0).first;
+    data = seperateTargets(data, 0).first; 
     write_csv(test_data, "customTest.csv");
 
     vector<string> vocab;

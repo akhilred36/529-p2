@@ -27,6 +27,7 @@ class logisticRegression{
         int k; //Number of classes
         double learningRate; //Learning rate
         double penaltyTerm; //Penalty term
+        int numItr; // number of iterations 
         MatrixXd delta; //Equation 29 Mitchell --> binary matrix that tells us which class each example belongs to
         MatrixXd X; //Feature matrix
         MatrixXd XT; //Transpose 
@@ -56,12 +57,35 @@ class logisticRegression{
             return;
         }
 
-        double Exp(double x){
-            return std::exp(x);
+        MatrixXd createTestX(vector<vector<int>> data){
+            MatrixXd result((int) data.size(), (int) data.at(0).size() + 1);
+
+            for(int i=0; i< data.size(); i++){
+                result(i, 0) = 1;
+                for(int j=1; j<data.at(i).size(); j++){
+                    result(i, j) = data.at(i).at(j);
+                }
+            }
+
+            return result;
+        }
+
+        void Exp(MatrixXd& matrix){
+            for(int i=0; i<k; i++){
+                for(int j=0; j<m; j++){
+                    matrix(i, j) = exp(matrix(i, j));
+                }
+            }
         }
 
     public:
-        logisticRegression(string trainFile, string vocab_file, string labels_file){
+        // Hyperparams still missing
+        logisticRegression(string trainFile, string vocab_file, string labels_file, double lr, double pt, int ni){
+            // Hyperparams
+            learningRate = lr; //Learning rate
+            penaltyTerm = pt; //Penalty term
+            numItr = ni;
+
             // Load labels and vocab from files
             n = (int) (read_lines(vocab_file)).size();
             k = (int) (read_lines(labels_file)).size();
@@ -111,13 +135,104 @@ class logisticRegression{
             for(int i=0; i<numCols; i++){
                 probMatrix.col(i) /= columnSums(i); //Normalize
             }
-            cout << "Original prob matrix: " << endl << probMatrix << endl;
-            probMatrix.exp();
-            cout << "New prob matrix: " << endl << probMatrix << endl;
+            cout << "Applying exp to probmatrix" << endl;
+            Exp(probMatrix);
+            cout << "Done applying exp to probmatrix" << endl;
+        }
+
+        void train() {
+            int currItr = 0;
+            while (currItr < numItr) {
+                W = W + learningRate * (((delta - probMatrix) * X) - (penaltyTerm * W));
+                currItr = currItr + 1;
+            }
+        }
+
+        int predict(MatrixXd features) {
+           MatrixXd results = W * features.transpose();   // k x 1 
+
+            int maxIndex = 0;
+            double maxValue = -std::numeric_limits<double>::infinity();
+
+            for (int i = 0; i < k; i++) {
+                if (maxValue < results(i, 0)) {
+                    maxIndex = i;
+                    maxValue = results(i, 0);
+                }
+            }
+            return maxIndex + 1;
+        }
+
+        void testModel(string file, bool produceSubmissionFile) {
+            chrono::steady_clock::time_point begin;
+            chrono::steady_clock::time_point end;
+            chrono::steady_clock::time_point begin1;
+            chrono::steady_clock::time_point end1;
+            begin = chrono::steady_clock::now();
+            vector<vector<int>> data = read_csv_int(file);
+            end = chrono::steady_clock::now();
+            std::cout << "Time to read file = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+            begin = chrono::steady_clock::now();
+            if (produceSubmissionFile) {
+                data = seperateTargets(data, 0).first;
+                MatrixXd testMatrix = createTestX(data);  // convert to eigen matrix
+
+                // Crete submission file
+                ofstream submission;
+                submission.open("submission.csv");
+                submission << "id,class" << endl;
+                begin1 = chrono::steady_clock::now();
+                for (int i = 0; i < data.size(); i++) {
+                    submission << 12001 + i << "," << predict(testMatrix.row(i)) << endl;
+                }
+                end1 = chrono::steady_clock::now();
+                std::cout << "Time to predict = " << std::chrono::duration_cast<std::chrono::milliseconds>(end1 - begin1).count() << "[ms]" << std::endl;
+                submission.close();
+            } else {
+                data = seperateTargets(data, 0).first;
+                vector<int> Y = seperateTargets(data, data.at(0).size() - 1).second;
+                data = seperateTargets(data, data.at(0).size() - 1).first;
+
+                MatrixXd testMatrix = createTestX(data);  // convert to eigen matrix
+
+                // Crete file to rec
+                ofstream record;
+                record.open("last_run_info.txt");
+
+                double correct = 0.0;
+                double total = 0.0;
+                int prediction;
+
+                for (int i = 0; i < Y.size(); i++) {
+                    prediction = predict(testMatrix.row(i));
+                    if (prediction == Y.at(i)) {
+                        correct = correct + 1.0;
+                        cout << prediction << " :)" << endl;
+                    } else {
+                        cout << prediction << " X" << endl;
+                    }
+                    total = total + 1.0;
+                }
+
+                record << "Total: " << total << endl << "Correct: " << correct << endl << "Accuracy: " << (correct/total) * 100 << "%" << endl;
+                record.close();
+            }
+            end = chrono::steady_clock::now();
+            std::cout << "Total time to predict classes = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;     
         }
 };
 
 int runLR(int argc, char** argv){
-    logisticRegression lr(argv[2], argv[3], argv[4]);
+    logisticRegression lr(argv[2], argv[3], argv[4], stod(argv[5]), stod(argv[6]), stoi(argv[7]));
+    cout << "Train start" << endl;
+    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+    lr.train();
+    chrono::steady_clock::time_point end = chrono::steady_clock::now();
+    std::cout << "Time to train model = " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "[s]" << std::endl;
+    
+    // lr.testModel("../testing.csv", true);
+
+    lr.testModel("customTest.csv", false);
+    
     return 0;
 }
