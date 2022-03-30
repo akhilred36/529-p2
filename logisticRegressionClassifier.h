@@ -123,18 +123,19 @@ class logisticRegression{
 
             //Transpose X and multiply with W
             XT = X.transpose();
-            probMatrix = W*XT;
 
             //Normalize probMatrix
-            int numRows = probMatrix.rows();
-            int numCols = probMatrix.cols();
+            int numRows = XT.rows();
+            int numCols = XT.cols();
             for(int i=0; i<numCols; i++){
-                probMatrix(numRows - 1, i) = 1; //Fill last row with all 1s
+                XT(numRows - 1, i) = 1; //Fill last row with all 1s
             }
-            VectorXd columnSums = probMatrix.colwise().sum();
+            VectorXd columnSums = XT.colwise().sum();
             for(int i=0; i<numCols; i++){
-                probMatrix.col(i) /= columnSums(i); //Normalize
+                XT.col(i) /= columnSums(i); //Normalize
             }
+
+            probMatrix = W*XT;
             cout << "Applying exp to probmatrix" << endl;
             Exp(probMatrix);
             cout << "Done applying exp to probmatrix" << endl;
@@ -149,8 +150,18 @@ class logisticRegression{
         }
 
         int predict(MatrixXd features) {
-           MatrixXd results = W * features.transpose();   // k x 1 
+            //Normalize results
+            int numRows = features.rows();
+            int numCols = features.cols();
+            for(int i=0; i<numCols; i++){
+                features(numRows - 1, i) = 1; //Fill last row with all 1s
+            }
+            VectorXd columnSums = features.colwise().sum();
+            for(int i=0; i<numCols; i++){
+                features.col(i) /= columnSums(i); //Normalize
+            }
 
+            MatrixXd results = W * features.transpose();   // k x 1 
             int maxIndex = 0;
             double maxValue = -std::numeric_limits<double>::infinity();
 
