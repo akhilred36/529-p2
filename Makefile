@@ -19,6 +19,9 @@ build_lr:
 run_lr:
 	./main.out lr ../training.csv ../vocabulary.txt ../newsgrouplabels.txt 0.001 0.01 1 
 
+run_lr_customTest:
+	./main.out lr dataMatrix.mtx ../vocabulary.txt ../newsgrouplabels.txt 0.01 0.01 50 
+
 debug:
 	g++ -o main.out main.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17
 

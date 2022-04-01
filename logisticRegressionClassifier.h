@@ -115,52 +115,57 @@ class logisticRegression{
             double w;
             for(int i=0; i<k; i++){
                 for(int j=0; j<n+1; j++){
-                    f = (double) rand() / RAND_MAX;
-                    w = 0 + f * (1 - 0);
-                    W(i, j) = w;
+                    W(i, j) = 0;
                 }
+            }
+
+            //Normalize X
+            int numRows = X.rows();
+            int numCols = X.cols();
+            VectorXd columnSums = X.colwise().sum();
+            for(int i=0; i<numCols; i++){
+                X.col(i) /= columnSums(i); //Normalize
             }
 
             //Transpose X and multiply with W
             XT = X.transpose();
 
-            //Normalize probMatrix
-            int numRows = XT.rows();
-            int numCols = XT.cols();
-            for(int i=0; i<numCols; i++){
-                XT(numRows - 1, i) = 1; //Fill last row with all 1s
-            }
-            VectorXd columnSums = XT.colwise().sum();
-            for(int i=0; i<numCols; i++){
-                XT.col(i) /= columnSums(i); //Normalize
-            }
-
             probMatrix = W*XT;
             cout << "Applying exp to probmatrix" << endl;
             Exp(probMatrix);
             cout << "Done applying exp to probmatrix" << endl;
+
+            //Normalize probMatrix
+            numRows = probMatrix.rows();
+            numCols = probMatrix.cols();
+            columnSums = probMatrix.colwise().sum();
+            for(int i=0; i<numCols; i++){
+                probMatrix.col(i) /= columnSums(i);
+            }
+
         }
 
         void train() {
             int currItr = 0;
             while (currItr < numItr) {
+                // W = W + learningRate * (((delta - probMatrix) * X) - (penaltyTerm * W));
+                // currItr = currItr + 1;
+                cout << currItr << endl;
+                probMatrix = W*XT;
+                Exp(probMatrix);
+                //Normalize probMatrix
+                int numRows = probMatrix.rows();
+                int numCols = probMatrix.cols();
+                VectorXd columnSums = probMatrix.colwise().sum();
+                for(int i=0; i<numCols; i++){
+                    probMatrix.col(i) /= columnSums(i);
+                }
                 W = W + learningRate * (((delta - probMatrix) * X) - (penaltyTerm * W));
-                currItr = currItr + 1;
+                currItr++;
             }
         }
 
         int predict(MatrixXd features) {
-            //Normalize results
-            int numRows = features.rows();
-            int numCols = features.cols();
-            for(int i=0; i<numCols; i++){
-                features(numRows - 1, i) = 1; //Fill last row with all 1s
-            }
-            VectorXd columnSums = features.colwise().sum();
-            for(int i=0; i<numCols; i++){
-                features.col(i) /= columnSums(i); //Normalize
-            }
-
             MatrixXd results = W * features.transpose();   // k x 1 
             int maxIndex = 0;
             double maxValue = -std::numeric_limits<double>::infinity();
