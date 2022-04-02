@@ -78,6 +78,19 @@ class logisticRegression{
             }
         }
 
+        void normalizeMatrix(MatrixXd& matrix){
+            //Normalize probMatrix
+            int numRows = matrix.rows();
+            int numCols = matrix.cols();
+            VectorXd columnSums = matrix.colwise().sum();
+            for(int i=0; i<numCols; i++){
+                if(columnSums(i) == 0){
+                    continue;
+                }
+                else matrix.col(i) /= columnSums(i);
+            }
+        }
+
     public:
         // Hyperparams still missing
         logisticRegression(string trainFile, string vocab_file, string labels_file, double lr, double pt, int ni){
@@ -85,6 +98,10 @@ class logisticRegression{
             learningRate = lr; //Learning rate
             penaltyTerm = pt; //Penalty term
             numItr = ni;
+
+            cout << "Learning Rate: " << learningRate << endl;
+            cout << "Penalty Term: " << penaltyTerm << endl;
+            cout << "num Itr: " << numItr << endl;
 
             // Load labels and vocab from files
             n = (int) (read_lines(vocab_file)).size();
@@ -120,53 +137,30 @@ class logisticRegression{
             }
 
             //Normalize X
-            int numRows = X.rows();
-            int numCols = X.cols();
-            VectorXd columnSums = X.colwise().sum();
-            for(int i=0; i<numCols; i++){
-                X.col(i) /= columnSums(i); //Normalize
-            }
+            normalizeMatrix(X);
 
             //Transpose X and multiply with W
             XT = X.transpose();
-
-            probMatrix = W*XT;
-            cout << "Applying exp to probmatrix" << endl;
-            Exp(probMatrix);
-            cout << "Done applying exp to probmatrix" << endl;
-
-            //Normalize probMatrix
-            numRows = probMatrix.rows();
-            numCols = probMatrix.cols();
-            columnSums = probMatrix.colwise().sum();
-            for(int i=0; i<numCols; i++){
-                probMatrix.col(i) /= columnSums(i);
-            }
-
         }
 
         void train() {
             int currItr = 0;
             while (currItr < numItr) {
-                // W = W + learningRate * (((delta - probMatrix) * X) - (penaltyTerm * W));
-                // currItr = currItr + 1;
-                cout << currItr << endl;
+                cout << "Current iteration: " << currItr << endl;
                 probMatrix = W*XT;
+                normalizeMatrix(probMatrix);
                 Exp(probMatrix);
-                //Normalize probMatrix
-                int numRows = probMatrix.rows();
-                int numCols = probMatrix.cols();
-                VectorXd columnSums = probMatrix.colwise().sum();
-                for(int i=0; i<numCols; i++){
-                    probMatrix.col(i) /= columnSums(i);
-                }
-                W = W + learningRate * (((delta - probMatrix) * X) - (penaltyTerm * W));
+                MatrixXd update = delta - probMatrix;
+                update = update * X;
+                MatrixXd penW = penaltyTerm * W;
+                update = update - penW;
+                W = W + learningRate * (update);
                 currItr++;
             }
         }
 
         int predict(MatrixXd features) {
-            MatrixXd results = W * features.transpose();   // k x 1 
+            MatrixXd results = W * features.transpose();   // k x 1
             int maxIndex = 0;
             double maxValue = -std::numeric_limits<double>::infinity();
 
