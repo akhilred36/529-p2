@@ -230,6 +230,43 @@ class logisticRegression{
             end = chrono::steady_clock::now();
             std::cout << "Total time to predict classes = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;     
         }
+
+        vector<vector<int>> getConfusionMatrix(int numClasses, string file){
+            vector<vector<int>> result;
+            //Initialize confusion matrix
+            for(int i=0; i<numClasses; i++){
+                vector<int> temp;
+                for(int j=0; j<numClasses; j++){
+                    temp.push_back(0);
+                }
+                result.push_back(temp);
+            }
+            chrono::steady_clock::time_point begin;
+            chrono::steady_clock::time_point end;
+            chrono::steady_clock::time_point begin1;
+            chrono::steady_clock::time_point end1;
+            begin = chrono::steady_clock::now();
+            vector<vector<int>> data = read_csv_int(file);
+            end = chrono::steady_clock::now();
+            std::cout << "Time to read file = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+            begin = chrono::steady_clock::now();
+            data = seperateTargets(data, 0).first;
+            vector<int> Y = seperateTargets(data, data.at(0).size() - 1).second;
+            data = seperateTargets(data, data.at(0).size() - 1).first;
+
+            MatrixXd testMatrix = createTestX(data);  // convert to eigen matrix
+
+            ofstream record;
+            record.open("cf.txt");
+            int prediction;
+
+            for (int i = 0; i < Y.size(); i++) {
+                prediction = predict(testMatrix.row(i));
+                result.at(Y.at(i) - 1).at(prediction - 1) += 1;
+            }
+
+            return result;
+        }
 };
 
 int runLR(int argc, char** argv){
@@ -243,6 +280,10 @@ int runLR(int argc, char** argv){
     // lr.testModel("../testing.csv", true);
 
     lr.testModel("customTest.csv", false);
-    
+    // ofstream confMatrixFile;
+    // confMatrixFile.open("../confMatrix.txt");
+    // vector<vector<int>> confMatrix = lr.getConfusionMatrix(20, "customTest.csv");
+    // writeIntMatrixToFile(confMatrix, confMatrixFile);
+    // confMatrixFile.close();
     return 0;
 }
