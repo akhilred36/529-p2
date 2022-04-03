@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "string": "cpp",
+        "vector": "cpp",
+        "array": "cpp",
+        "iosfwd": "cpp",
+        "string_view": "cpp",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "random": "cpp",
+        "cmath": "cpp",
+        "chrono": "cpp",
+        "iostream": "cpp",
+        "xstring": "cpp"
+    },
+    "cmake.configureOnOpen": false
+}

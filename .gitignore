@@ -30,3 +30,21 @@
 *.exe
 *.out
 *.app
+
+#CSV files
+*.csv
+
+#Cygwin dumps
+*.stackdump
+
+#Custom intermediate files
+*.vec
+*.mtx
+
+#VSCode workspace
+*.vscode
+
+#Text files
+scores/*.txt
+last_run_info.txt
+.vscode/settings.json
