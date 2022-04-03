@@ -78,6 +78,19 @@ class logisticRegression{
             }
         }
 
+        void normalizeMatrix(MatrixXd& matrix){
+            //Normalize probMatrix
+            int numRows = matrix.rows();
+            int numCols = matrix.cols();
+            VectorXd columnSums = matrix.colwise().sum();
+            for(int i=0; i<numCols; i++){
+                if(columnSums(i) == 0){
+                    continue;
+                }
+                else matrix.col(i) /= columnSums(i);
+            }
+        }
+
     public:
         // Hyperparams still missing
         logisticRegression(string trainFile, string vocab_file, string labels_file, double lr, double pt, int ni){
@@ -85,6 +98,10 @@ class logisticRegression{
             learningRate = lr; //Learning rate
             penaltyTerm = pt; //Penalty term
             numItr = ni;
+
+            cout << "Learning Rate: " << learningRate << endl;
+            cout << "Penalty Term: " << penaltyTerm << endl;
+            cout << "num Itr: " << numItr << endl;
 
             // Load labels and vocab from files
             n = (int) (read_lines(vocab_file)).size();
@@ -115,42 +132,35 @@ class logisticRegression{
             double w;
             for(int i=0; i<k; i++){
                 for(int j=0; j<n+1; j++){
-                    f = (double) rand() / RAND_MAX;
-                    w = 0 + f * (1 - 0);
-                    W(i, j) = w;
+                    W(i, j) = 0;
                 }
             }
 
+            //Normalize X
+            normalizeMatrix(X);
+
             //Transpose X and multiply with W
             XT = X.transpose();
-            probMatrix = W*XT;
-
-            //Normalize probMatrix
-            int numRows = probMatrix.rows();
-            int numCols = probMatrix.cols();
-            for(int i=0; i<numCols; i++){
-                probMatrix(numRows - 1, i) = 1; //Fill last row with all 1s
-            }
-            VectorXd columnSums = probMatrix.colwise().sum();
-            for(int i=0; i<numCols; i++){
-                probMatrix.col(i) /= columnSums(i); //Normalize
-            }
-            cout << "Applying exp to probmatrix" << endl;
-            Exp(probMatrix);
-            cout << "Done applying exp to probmatrix" << endl;
         }
 
         void train() {
             int currItr = 0;
             while (currItr < numItr) {
-                W = W + learningRate * (((delta - probMatrix) * X) - (penaltyTerm * W));
-                currItr = currItr + 1;
+                cout << "Current iteration: " << currItr << endl;
+                probMatrix = W*XT;
+                normalizeMatrix(probMatrix);
+                Exp(probMatrix);
+                MatrixXd update = delta - probMatrix;
+                update = update * X;
+                MatrixXd penW = penaltyTerm * W;
+                update = update - penW;
+                W = W + learningRate * (update);
+                currItr++;
             }
         }
 
         int predict(MatrixXd features) {
-           MatrixXd results = W * features.transpose();   // k x 1 
-
+            MatrixXd results = W * features.transpose();   // k x 1
             int maxIndex = 0;
             double maxValue = -std::numeric_limits<double>::infinity();
 
@@ -220,6 +230,43 @@ class logisticRegression{
             end = chrono::steady_clock::now();
             std::cout << "Total time to predict classes = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;     
         }
+
+        vector<vector<int>> getConfusionMatrix(int numClasses, string file){
+            vector<vector<int>> result;
+            //Initialize confusion matrix
+            for(int i=0; i<numClasses; i++){
+                vector<int> temp;
+                for(int j=0; j<numClasses; j++){
+                    temp.push_back(0);
+                }
+                result.push_back(temp);
+            }
+            chrono::steady_clock::time_point begin;
+            chrono::steady_clock::time_point end;
+            chrono::steady_clock::time_point begin1;
+            chrono::steady_clock::time_point end1;
+            begin = chrono::steady_clock::now();
+            vector<vector<int>> data = read_csv_int(file);
+            end = chrono::steady_clock::now();
+            std::cout << "Time to read file = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "[ms]" << std::endl;
+            begin = chrono::steady_clock::now();
+            data = seperateTargets(data, 0).first;
+            vector<int> Y = seperateTargets(data, data.at(0).size() - 1).second;
+            data = seperateTargets(data, data.at(0).size() - 1).first;
+
+            MatrixXd testMatrix = createTestX(data);  // convert to eigen matrix
+
+            ofstream record;
+            record.open("cf.txt");
+            int prediction;
+
+            for (int i = 0; i < Y.size(); i++) {
+                prediction = predict(testMatrix.row(i));
+                result.at(Y.at(i) - 1).at(prediction - 1) += 1;
+            }
+
+            return result;
+        }
 };
 
 int runLR(int argc, char** argv){
@@ -233,6 +280,10 @@ int runLR(int argc, char** argv){
     // lr.testModel("../testing.csv", true);
 
     lr.testModel("customTest.csv", false);
-    
+    // ofstream confMatrixFile;
+    // confMatrixFile.open("../confMatrix.txt");
+    // vector<vector<int>> confMatrix = lr.getConfusionMatrix(20, "customTest.csv");
+    // writeIntMatrixToFile(confMatrix, confMatrixFile);
+    // confMatrixFile.close();
     return 0;
 }

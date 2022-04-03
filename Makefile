@@ -2,7 +2,7 @@ all:   # Add new files to this target's compil chain
 	g++ -o main.out main.cpp node.cpp node.h pythonpp.cpp pythonpp.h  tree.cpp tree.h 
 
 preprocess:
-	g++ -I eigen/ -o preprocess.out preprocess.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17 && rm *.vec && rm *.mtx && ./preprocess.out ../training.csv ../vocabulary.txt ../newsgrouplabels.txt 1
+	g++ -I eigen/ -o preprocess.out preprocess.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17 && rm -f *.vec && rm -f *.mtx && ./preprocess.out ../training.csv ../vocabulary.txt ../newsgrouplabels.txt 0.8
 
 build:
 	g++ -I eigen/ main.cpp pythonpp.cpp pythonpp.h chisqr.c chisqr.h gamma.c gamma.h -std=gnu++17 -g logisticRegressionClassifier.h NaiveBayesClassifier.h -o main.out
@@ -17,7 +17,10 @@ build_lr:
 	g++ -I eigen/ main.cpp pythonpp.cpp pythonpp.h chisqr.c chisqr.h gamma.c gamma.h -fopenmp -std=gnu++17 -g logisticRegressionClassifier.h -o main.out 
 
 run_lr:
-	./main.out lr ../training.csv ../vocabulary.txt ../newsgrouplabels.txt 0.001 0.01 1 
+	./main.out lr dataMatrix.mtx ../vocabulary.txt ../newsgrouplabels.txt 0.001 0.01 1 
+
+run_lr_customTest:
+	./main.out lr dataMatrix.mtx ../vocabulary.txt ../newsgrouplabels.txt 0.01 0.01 50 
 
 debug:
 	g++ -o main.out main.cpp chisqr.c chisqr.h gamma.c gamma.h pythonpp.cpp pythonpp.h -g -std=gnu++17
